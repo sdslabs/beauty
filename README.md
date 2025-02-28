@@ -1,0 +1,2 @@
+# beauty
+Frontend for beast
