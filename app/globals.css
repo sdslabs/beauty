@@ -25,3 +25,12 @@ body {
     text-wrap: balance;
   }
 }
+
+html.dark {
+  --background: #000;
+  --foreground: #a5a5a5;
+}
+html.light {
+  --background: #fff;
+  --foreground: #000;
+}
