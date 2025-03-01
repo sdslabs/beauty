@@ -1,101 +1,91 @@
+"use client";
+import { useEffect } from "react";
+import useStore from "@/lib/store/useStore";
+import api from "@/lib/api/config";
 import Image from "next/image";
+import Link from "next/link";
+import { configureService } from "@/lib/api/services/configure";
+import moment from "moment-timezone";
+import Navbar from "@/lib/components/NavBar";
+import Footer from "@/lib/components/Footer";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const { name, about, startingTime, endingTime, prizes, setConfig } = useStore();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+  useEffect(() => {
+    async function fetchConfig() {
+      try {
+        const response = await configureService.getConfigs();
+        console.log("response", response);
+        setConfig({
+          name: response.data.name,
+          about: response.data.about,
+          startingTime: response.data.starting_time,
+          endingTime: response.data.ending_time,
+          prizes: response.data.prizes,
+          logoUrl: response.data.logo_url,
+        });
+      } catch (error) {
+        console.error("Failed to fetch config:", error);
+      }
+    }
+
+    fetchConfig();
+  }, [setConfig]);
+
+  const formatDate = (dateString: string) => {
+    const parsedDate = moment(dateString, "HH:mm:ss [UTC:] Z, Do MMMM YYYY, dddd");
+  
+    if (!parsedDate.isValid()) {
+      return "Invalid Date";
+    }
+  
+    return parsedDate.format("dddd, MMMM Do YYYY, hh:mm:ss A z");
+  };
+  return (
+    <main className="min-h-screen bg-gray-100">
+      <Navbar/>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+          <div className="flex-1 space-y-8">
+            <h1 className="text-5xl font-bold leading-tight">
+              Be a part of <br />
+              <span className="text-blue-600">{name || "Loading..."}</span>
+            </h1>
+            <p className="text-xl text-gray-600">{about || "Loading..."}</p>
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-lg font-medium text-gray-600">Starting Time</h2>
+                <p className="text-xl font-semibold text-gray-800">
+                  {startingTime ? formatDate(startingTime) : "Loading..."}
+                </p>
+              </div>
+              <div>
+                <h2 className="text-lg font-medium text-gray-600">Ending Time</h2>
+                <p className="text-xl font-semibold text-gray-800">
+                  {endingTime ? formatDate(endingTime) : "Loading..."}
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/register"
+              className="inline-block px-8 py-3 text-lg font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200"
+            >
+              Register Now
+            </Link>
+          </div>
+          <div className="flex-1">
             <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+              src="/assets/landing1.svg"
+              alt="Landing illustration"
+              width={600}
+              height={400}
+              className="w-full h-auto"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </div>
+      <Footer/>
+    </main>
   );
 }
